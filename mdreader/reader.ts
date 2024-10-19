@@ -24,8 +24,6 @@ function createTurndownService(url: string): TurndownService {
           return `![${node.getAttribute('alt') || ''}](${absoluteSrc})`;
         }
         return '';
-
-        
       },
     },
   ];
