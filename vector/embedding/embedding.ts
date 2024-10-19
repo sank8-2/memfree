@@ -1,7 +1,7 @@
-import { type EmbeddingsInterface } from "@langchain/core/embeddings";
-import { localEmbedding } from "./local";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { DIMENSIONS, EMBEDDING_MODEL } from "../config";
+import { type EmbeddingsInterface } from '@langchain/core/embeddings';
+import { localEmbedding } from './local';
+import { OpenAIEmbeddings } from '@langchain/openai';
+import { DIMENSIONS, EMBEDDING_MODEL } from '../config';
 
 export function getEmbedding(): EmbeddingsInterface {
   if (process.env.OPENAI_API_KEY) {

@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <p className="flex justify-center w-[400px] text-xl pt-2 text-gradient_indigo-purple font-medium">
+    <p className="text-gradient_indigo-purple flex w-[400px] justify-center pt-2 text-xl font-medium">
       MemFree
     </p>
   );

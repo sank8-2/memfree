@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { Redis } from '@upstash/redis';
 
 const url = process.env.UPSTASH_REDIS_REST_URL as string;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN as string;
@@ -9,13 +9,13 @@ export const redis = new Redis({
   enableAutoPipelining: true,
 });
 
-export const URLS_KEY = "urls:";
-export const ERROR_URLS_KEY = "error_urls:";
-export const INDEX_COUNT_KEY = "index_count:";
-export const TOTAL_INDEX_COUNT_KEY = "t_index_count:";
+export const URLS_KEY = 'urls:';
+export const ERROR_URLS_KEY = 'error_urls:';
+export const INDEX_COUNT_KEY = 'index_count:';
+export const TOTAL_INDEX_COUNT_KEY = 't_index_count:';
 
-export const SEARCH_COUNT_KEY = "s_count:";
-export const TOTAL_SEARCH_COUNT_KEY = "t_s_count:";
+export const SEARCH_COUNT_KEY = 's_count:';
+export const TOTAL_SEARCH_COUNT_KEY = 't_s_count:';
 
 export async function addUrl(userId: string, url: string): Promise<number> {
   const date = Date.now();
@@ -27,10 +27,10 @@ export async function addUrl(userId: string, url: string): Promise<number> {
     ]);
 
   console.log(
-    "Result of all operations:",
+    'Result of all operations:',
     zaddResult,
     incrIndexCountResult,
-    incrTotalIndexCountResult
+    incrTotalIndexCountResult,
   );
   return incrIndexCountResult;
 }
@@ -64,7 +64,7 @@ export async function clearUrls(userId: string): Promise<void> {
 
 async function getCount(key: string): Promise<number> {
   const value = await redis.get(key);
-  return parseInt((value as string) || "0", 10);
+  return parseInt((value as string) || '0', 10);
 }
 
 export async function incIndexCount(userId: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { log } from "./log";
+import { log } from './log';
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -7,7 +7,7 @@ export function sleep(ms: number) {
 export async function retryAsync<T>(
   fn: () => Promise<T>,
   retries: number = 3,
-  delayFactor: number = 1000
+  delayFactor: number = 1000,
 ) {
   let attempt = 0;
 
@@ -19,7 +19,7 @@ export async function retryAsync<T>(
       if (attempt < retries) {
         const delay = Math.pow(2, attempt) * delayFactor; // Exponential backoff: 1s, 2s, 4s, ...
         console.log(
-          `Attempt ${attempt} failed. Retrying in ${delay / 1000} seconds`
+          `Attempt ${attempt} failed. Retrying in ${delay / 1000} seconds`,
         );
         await sleep(delay);
       } else {
@@ -34,7 +34,7 @@ export async function fetchWithRetry(
   url: string,
   options = {},
   retries = 3,
-  delay = 1000
+  delay = 1000,
 ): Promise<string> {
   for (let i = 0; i < retries; i++) {
     try {
@@ -42,20 +42,20 @@ export async function fetchWithRetry(
       if (!response.ok) {
         const errorText = await response.text();
         console.error(
-          "Error during fetch md ",
+          'Error during fetch md ',
           url,
           response.status,
-          errorText
+          errorText,
         );
         throw new Error(
-          `Error during fetch md, ${url},  ${response.status}, ${errorText}`
+          `Error during fetch md, ${url},  ${response.status}, ${errorText}`,
         );
       }
       return response.text();
     } catch (error) {
       if (i === retries - 1) throw error;
       console.error(
-        `Attempt ${url} ${i + 1} failed: ${error}. Retrying in ${delay}ms...`
+        `Attempt ${url} ${i + 1} failed: ${error}. Retrying in ${delay}ms...`,
       );
       await sleep(delay);
       delay *= 2;
@@ -66,17 +66,17 @@ export async function fetchWithRetry(
 
 export function isValidUrl(input: string): boolean {
   try {
-    if (input.startsWith("local-md-")) {
+    if (input.startsWith('local-md-')) {
       return true;
     }
 
     const url = new URL(input);
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
       return false;
     }
 
     const hostname = url.hostname;
-    if (!hostname.includes(".")) {
+    if (!hostname.includes('.')) {
       return false;
     }
 
@@ -90,7 +90,7 @@ export function isValidUrl(input: string): boolean {
   }
 }
 
-const jinaToken = process.env.JINA_KEY || "";
+const jinaToken = process.env.JINA_KEY || '';
 
 function getMdReaderUrl(url: string, useFallback: boolean = false) {
   if (!useFallback && process.env.MD_READER_URL) {
@@ -104,7 +104,7 @@ export async function getMd(url: string, userId: string) {
   const primaryUrl = getMdReaderUrl(url);
   const fallbackUrl = getMdReaderUrl(url, true);
 
-  let headers: HeadersInit = { "X-Timeout": "10" };
+  let headers: HeadersInit = { 'X-Timeout': '10' };
   if (jinaToken) {
     headers = { ...headers, Authorization: `Bearer ${jinaToken}` };
   }
@@ -112,13 +112,13 @@ export async function getMd(url: string, userId: string) {
   try {
     return await fetchWithRetry(primaryUrl, { headers }, 1, 1000);
   } catch (primaryError) {
-    console.error("Primary URL failed:", primaryError);
+    console.error('Primary URL failed:', primaryError);
     try {
       return await fetchWithRetry(fallbackUrl, { headers }, 1, 1000);
     } catch (fallbackError) {
-      console.error("Fallback URL failed:", fallbackError);
+      console.error('Fallback URL failed:', fallbackError);
       log({
-        service: "vector",
+        service: 'vector',
         action: `error-md`,
         error: fallbackError,
         url: url,
@@ -129,32 +129,32 @@ export async function getMd(url: string, userId: string) {
   }
 }
 
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 export async function writeToJsonlFile(
   url: string,
-  data: Array<Record<string, unknown>>
+  data: Array<Record<string, unknown>>,
 ): Promise<void> {
-  const sanitizedUrl = url.replace(/\//g, "-");
+  const sanitizedUrl = url.replace(/\//g, '-');
   const filePath = path.join(process.cwd(), `${sanitizedUrl}.jsonl`);
 
   console.log(`Writing to ${filePath}`);
 
-  const writeStream = fs.createWriteStream(filePath, { flags: "a" });
+  const writeStream = fs.createWriteStream(filePath, { flags: 'a' });
 
   for (const record of data) {
-    writeStream.write(JSON.stringify(record) + "\n");
+    writeStream.write(JSON.stringify(record) + '\n');
   }
 
   writeStream.end();
 }
 
-import readline from "readline";
+import readline from 'readline';
 export async function readFromJsonlFile(
-  url: string
+  url: string,
 ): Promise<Array<Record<string, unknown>>> {
-  const sanitizedUrl = url.replace(/\//g, "-");
+  const sanitizedUrl = url.replace(/\//g, '-');
   const filePath = path.join(process.cwd(), `${sanitizedUrl}.jsonl`);
 
   const data: Array<Record<string, unknown>> = [];

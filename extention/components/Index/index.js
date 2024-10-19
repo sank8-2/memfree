@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import CheckboxTree from "react-checkbox-tree";
-import "react-checkbox-tree/lib/react-checkbox-tree.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from 'react';
+import CheckboxTree from 'react-checkbox-tree';
+import 'react-checkbox-tree/lib/react-checkbox-tree.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
   faCheckSquare,
@@ -14,7 +14,7 @@ import {
   faFolder,
   faFolderOpen,
   faFile,
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
 
 const fontAwesomeIcons = {
   check: (
@@ -93,12 +93,12 @@ export default function Index() {
   };
 
   useEffect(() => {
-    chrome.storage.local.get(["user"], (result) => {
+    chrome.storage.local.get(['user'], (result) => {
       if (result.user) {
-        console.log("User found in local storage:", result.user);
+        console.log('User found in local storage:', result.user);
         setUserInfo(result.user);
       } else {
-        fetch("https://www.memfree.me/api/auth/session")
+        fetch('https://www.memfree.me/api/auth/session')
           .then((response) => response.json())
           .then((data) => {
             if (!data || !data.user) {
@@ -110,7 +110,7 @@ export default function Index() {
             }
           })
           .catch((error) =>
-            console.error("Error fetching user session:", error)
+            console.error('Error fetching user session:', error),
           );
       }
     });
@@ -119,12 +119,12 @@ export default function Index() {
 
   const updateProgress = () => {
     chrome.storage.local.get(
-      ["progress", "totalUrlsIndexed", "hasError"],
+      ['progress', 'totalUrlsIndexed', 'hasError'],
       (storage) => {
         setProgressPercentage(storage.progress || 0);
         setTotalUrlsIndexed(storage.totalUrlsIndexed || 0);
         setHasError(storage.hasError || false);
-      }
+      },
     );
   };
 
@@ -136,10 +136,10 @@ export default function Index() {
   const handleSyncSelectedBookmarks = () => {
     syncBookmarks({
       folders: checked.filter((id) =>
-        nodes.some((n) => n.value === id && n.children)
+        nodes.some((n) => n.value === id && n.children),
       ),
       bookmarks: checked.filter(
-        (id) => !nodes.some((n) => n.value === id && n.children)
+        (id) => !nodes.some((n) => n.value === id && n.children),
       ),
     });
   };
@@ -209,18 +209,18 @@ export default function Index() {
   const syncBookmarks = (selectedItems) => {
     chrome.runtime.sendMessage(
       {
-        action: "processBookmarks",
+        action: 'processBookmarks',
         items: selectedItems,
       },
       (response) => {
-        if (response.status !== "processing") {
+        if (response.status !== 'processing') {
           alert(
-            "An error occurred while processing your bookmarks. Please try again."
+            'An error occurred while processing your bookmarks. Please try again.',
           );
         } else {
           alert(`Processing ${selectedItems.bookmarks.length} bookmarks`);
         }
-      }
+      },
     );
   };
 
@@ -234,9 +234,9 @@ export default function Index() {
   };
 
   return (
-    <div className="container p-4 bg-white rounded shadow-xl">
+    <div className="container rounded bg-white p-4 shadow-xl">
       {userInfo && (
-        <div className="flex justify-center mb-2 text-md font-medium">
+        <div className="text-md mb-2 flex justify-center font-medium">
           Welcome {userInfo.name}
         </div>
       )}
@@ -244,19 +244,19 @@ export default function Index() {
       {!userInfo && (
         <button
           id="login-button"
-          className="bg-indigo-500 w-full text-white px-4 py-2 mt-4 rounded hover:bg-indigo-600 transition-colors"
-          style={{ display: !userInfo ? "inline-block" : "none" }}
-          onClick={() => window.open("https://www.memfree.me/login", "_blank")}
+          className="mt-4 w-full rounded bg-indigo-500 px-4 py-2 text-white transition-colors hover:bg-indigo-600"
+          style={{ display: !userInfo ? 'inline-block' : 'none' }}
+          onClick={() => window.open('https://www.memfree.me/login', '_blank')}
         >
           Login
         </button>
       )}
 
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <button
           id="processBookmarksButton"
-          className={`text-white px-4 w-full py-2 my-2 rounded ${
-            isDisabled() ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-500"
+          className={`my-2 w-full rounded px-4 py-2 text-white ${
+            isDisabled() ? 'cursor-not-allowed bg-gray-400' : 'bg-indigo-500'
           }`}
           disabled={isDisabled()}
           onClick={handleChooseookmarks}
@@ -266,26 +266,26 @@ export default function Index() {
       </div>
 
       {progressPercentage > 0 && (
-        <div className="progress-bar w-full h-8 bg-gray-300 mt-4 rounded relative overflow-hidden flex items-center justify-center">
+        <div className="progress-bar relative mt-4 flex h-8 w-full items-center justify-center overflow-hidden rounded bg-gray-300">
           <div
-            className="progress bg-indigo-500 absolute top-0 left-0 h-full"
+            className="progress absolute left-0 top-0 h-full bg-indigo-500"
             style={{
               width: `${progressPercentage}%`,
-              transition: "width 0.4s",
+              transition: 'width 0.4s',
             }}
           ></div>
-          <span className="text-white z-10">{`Index Progress: ${progressPercentage}%`}</span>
+          <span className="z-10 text-white">{`Index Progress: ${progressPercentage}%`}</span>
         </div>
       )}
 
       {totalUrlsIndexed > 0 && (
-        <div className="flex justify-center items-center result-info text-indigo-500 mt-4 text-sm font-medium">
+        <div className="result-info mt-4 flex items-center justify-center text-sm font-medium text-indigo-500">
           {`${totalUrlsIndexed} Bookmark Indexed`}
         </div>
       )}
 
       {hasError && (
-        <div className="flex justify-center items-center result-info text-red-500 mt-4 text-sm font-medium">
+        <div className="result-info mt-4 flex items-center justify-center text-sm font-medium text-red-500">
           Error occurred while processing bookmarks, please try again.
         </div>
       )}
@@ -304,7 +304,7 @@ export default function Index() {
           />
           <button
             id="syncSelectedBookmarksButton"
-            className="bg-indigo-500 text-white w-full px-4 py-2 mt-4 rounded hover:bg-indigo-600 transition-colors"
+            className="mt-4 w-full rounded bg-indigo-500 px-4 py-2 text-white transition-colors hover:bg-indigo-600"
             onClick={handleSyncSelectedBookmarks}
           >
             Index Selected Bookmarks

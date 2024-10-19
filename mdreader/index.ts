@@ -1,14 +1,14 @@
-import { serve } from "bun";
-import { urlToMarkdown } from "./reader";
-import { browserService } from "./browser";
+import { serve } from 'bun';
+import { urlToMarkdown } from './reader';
+import { browserService } from './browser';
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const path = url.pathname;
   const { method } = req;
 
-  if (path === "/" && method === "GET") {
-    const targetUrl = url.searchParams.get("url");
+  if (path === '/' && method === 'GET') {
+    const targetUrl = url.searchParams.get('url');
     if (targetUrl) {
       try {
         const markdown = await urlToMarkdown(targetUrl);
@@ -20,9 +20,9 @@ export async function handleRequest(req: Request): Promise<Response> {
         });
       }
     }
-    return new Response("Welcome to mdreader");
+    return new Response('Welcome to mdreader');
   }
-  return new Response("Welcome to mdreader");
+  return new Response('Welcome to mdreader');
 }
 
 const server = serve({
@@ -32,8 +32,8 @@ const server = serve({
 
 console.log(`Server is running on port ${server.port}`);
 
-process.on("SIGINT", async () => {
-  console.log("Shutting down...");
+process.on('SIGINT', async () => {
+  console.log('Shutting down...');
   await browserService.close();
   process.exit();
 });

@@ -1,4 +1,4 @@
-import * as lancedb from "@lancedb/lancedb";
+import * as lancedb from '@lancedb/lancedb';
 import {
   Schema,
   Field,
@@ -6,33 +6,33 @@ import {
   FixedSizeList,
   Utf8,
   Float64,
-} from "apache-arrow";
-import { DIMENSIONS } from "./config";
-import { getEmbedding } from "./embedding/embedding";
-import { retryAsync } from "./util";
+} from 'apache-arrow';
+import { DIMENSIONS } from './config';
+import { getEmbedding } from './embedding/embedding';
+import { retryAsync } from './util';
 
 const schema = new Schema([
-  new Field("create_time", new Float64(), true),
-  new Field("title", new Utf8(), true),
-  new Field("url", new Utf8(), true),
-  new Field("image", new Utf8(), true),
-  new Field("text", new Utf8(), true),
+  new Field('create_time', new Float64(), true),
+  new Field('title', new Utf8(), true),
+  new Field('url', new Utf8(), true),
+  new Field('image', new Utf8(), true),
+  new Field('text', new Utf8(), true),
   new Field(
-    "vector",
-    new FixedSizeList(DIMENSIONS, new Field("item", new Float32())),
-    true
+    'vector',
+    new FixedSizeList(DIMENSIONS, new Field('item', new Float32())),
+    true,
   ),
 ]);
 
 async function getConnection() {
-  const bucket = process.env.AWS_BUCKET || "";
+  const bucket = process.env.AWS_BUCKET || '';
   if (bucket) {
     return await lancedb.connect(bucket, {
       storageOptions: {
-        awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-        s3Express: "true",
-        region: process.env.AWS_REGION || "",
-        awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+        awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+        s3Express: 'true',
+        region: process.env.AWS_REGION || '',
+        awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
       },
     });
   } else {
@@ -54,10 +54,10 @@ export async function deleteUrls(tableName: string, urls: string[]) {
   const db = await getConnection();
   await retryAsync(async () => {
     const table = await getTable(db, tableName);
-    const predicate = `url IN (${urls.map((url) => `'${url}'`).join(", ")})`;
+    const predicate = `url IN (${urls.map((url) => `'${url}'`).join(', ')})`;
     await table.delete(predicate);
   });
-  console.log("urls", urls, "already exists for user", tableName, "deleted");
+  console.log('urls', urls, 'already exists for user', tableName, 'deleted');
 }
 
 export async function append(tableName: string, data: lancedb.Data) {
@@ -71,30 +71,30 @@ export async function search(query: string, table: string, url?: string) {
   const db = await getConnection();
   const tbl = await db.openTable(table);
 
-  console.time("embedding");
+  console.time('embedding');
   const query_embedding = await getEmbedding().embedQuery(query);
-  console.timeEnd("embedding");
+  console.timeEnd('embedding');
 
-  console.time("search");
+  console.time('search');
   let results: any[] = [];
   if (url) {
     results = await tbl
       .vectorSearch(query_embedding)
       .where(`url == '${url}'`)
-      .select(["title", "text", "url", "image"])
-      .distanceType("cosine")
+      .select(['title', 'text', 'url', 'image'])
+      .distanceType('cosine')
       .limit(10)
       .toArray();
   } else {
     results = await tbl
       .vectorSearch(query_embedding)
-      .select(["title", "text", "url", "image"])
-      .distanceType("cosine")
+      .select(['title', 'text', 'url', 'image'])
+      .distanceType('cosine')
       .limit(10)
       .toArray();
   }
 
-  console.timeEnd("search");
+  console.timeEnd('search');
   return results;
 }
 
@@ -110,33 +110,33 @@ export async function changeEmbedding(tableName: string) {
   const db = await getConnection();
   const table = await getTable(db, tableName);
 
-  console.time("select-text");
+  console.time('select-text');
   const documents: Document[] = (await table
     .query()
-    .select(["title", "url", "image", "create_time", "text"])
+    .select(['title', 'url', 'image', 'create_time', 'text'])
     .toArray()) as Document[];
-  console.timeEnd("select-text");
-  console.log("Embedding", documents.length);
+  console.timeEnd('select-text');
+  console.log('Embedding', documents.length);
 
   const texts = documents.map((item) => item.text);
 
-  console.time("embedding");
+  console.time('embedding');
   const embeddings = await getEmbedding().embedDocuments(texts);
-  console.timeEnd("embedding");
+  console.timeEnd('embedding');
 
   const documentsWithVectors = documents.map((doc, i) => ({
     ...doc,
     vector: embeddings[i] as number[],
   }));
 
-  console.time("createTable");
+  console.time('createTable');
   const newTable = await db.createTable(tableName, documentsWithVectors, {
-    mode: "overwrite",
+    mode: 'overwrite',
     schema: schema,
   });
-  console.timeEnd("createTable");
+  console.timeEnd('createTable');
 
-  console.log("Table size", await newTable.countRows());
+  console.log('Table size', await newTable.countRows());
 
   await newTable.optimize({ cleanupOlderThan: new Date() });
   return newTable;
@@ -156,7 +156,7 @@ export async function createEmptyTable(tableName: string) {
 
 export async function reCreateEmptyTable(tableName: string) {
   const db = await getConnection();
-  return await db.createEmptyTable(tableName, schema, { mode: "overwrite" });
+  return await db.createEmptyTable(tableName, schema, { mode: 'overwrite' });
 }
 
 export async function size(tableName: string) {
@@ -175,10 +175,10 @@ export async function update(tableName: string) {
   const db = await getConnection();
   const table = await getTable(db, tableName);
   await table.update(
-    { price: "100000" },
+    { price: '100000' },
     {
-      where: "id == 3",
-    }
+      where: 'id == 3',
+    },
   );
 }
 
@@ -199,12 +199,12 @@ export async function selectDetail(table: string) {
   const db = await getConnection();
   const tbl = await db.openTable(table);
 
-  console.time("select");
+  console.time('select');
   const result = await tbl
     .query()
-    .select(["title", "text"])
+    .select(['title', 'text'])
     .limit(100)
     .toArray();
-  console.timeEnd("select");
+  console.timeEnd('select');
   return result;
 }

@@ -1,10 +1,10 @@
-import { describe, it, expect } from "bun:test";
-import { DIMENSIONS } from "../config";
-import { localEmbedding } from "../embedding/local";
-import { openaiEmbedding } from "../embedding/openai";
+import { describe, it, expect } from 'bun:test';
+import { DIMENSIONS } from '../config';
+import { localEmbedding } from '../embedding/local';
+import { openaiEmbedding } from '../embedding/openai';
 
-describe("local embedding test", () => {
-  it("should embedding successfully", async () => {
+describe('local embedding test', () => {
+  it('should embedding successfully', async () => {
     const query = "what's the memfree";
     const query_embedding = await localEmbedding.embedQuery(query);
 
@@ -13,10 +13,10 @@ describe("local embedding test", () => {
     expect(query_embedding.length).toBe(DIMENSIONS);
 
     let documents = [
-      "what is fastembed-js licensed",
-      "fastembed-js is licensed under MIT ",
-      "memfree is a ai search engine",
-      "hybrid ai search engine",
+      'what is fastembed-js licensed',
+      'fastembed-js is licensed under MIT ',
+      'memfree is a ai search engine',
+      'hybrid ai search engine',
     ];
 
     const embeddings = await localEmbedding.embedDocuments(documents);
@@ -30,8 +30,8 @@ describe("local embedding test", () => {
   });
 });
 
-describe("openai embedding test", () => {
-  it("should embedding successfully", async () => {
+describe('openai embedding test', () => {
+  it('should embedding successfully', async () => {
     const query = "what's the memfree";
     const query_embedding = await openaiEmbedding.embedQuery(query);
 
@@ -40,10 +40,10 @@ describe("openai embedding test", () => {
     expect(query_embedding.length).toBe(DIMENSIONS);
 
     let documents = [
-      "what is fastembed-js licensed",
-      "fastembed-js is licensed under MIT ",
-      "memfree is a ai search engine",
-      "hybrid ai search engine",
+      'what is fastembed-js licensed',
+      'fastembed-js is licensed under MIT ',
+      'memfree is a ai search engine',
+      'hybrid ai search engine',
     ];
 
     const embeddings = await openaiEmbedding.embedDocuments(documents);

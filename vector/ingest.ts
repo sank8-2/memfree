@@ -1,12 +1,12 @@
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { Document } from "@langchain/core/documents";
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { Document } from '@langchain/core/documents';
 
-import { append } from "./db";
-import { getMd, readFromJsonlFile } from "./util";
-import { getEmbedding } from "./embedding/embedding";
-import { processTweet } from "./tweet";
+import { append } from './db';
+import { getMd, readFromJsonlFile } from './util';
+import { getEmbedding } from './embedding/embedding';
+import { processTweet } from './tweet';
 
-const mdSplitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+const mdSplitter = RecursiveCharacterTextSplitter.fromLanguage('markdown', {
   chunkSize: 400,
   chunkOverlap: 40,
 });
@@ -31,10 +31,10 @@ export async function ingest_text_content(
   url: string,
   userId: string,
   content: string,
-  title: string
+  title: string,
 ) {
   const documents = await textSplitter.createDocuments([content]);
-  const data = await addVectors("", title, url, documents);
+  const data = await addVectors('', title, url, documents);
   const table = await append(userId, data);
 }
 
@@ -43,7 +43,7 @@ async function processIngestion(
   userId: string,
   markdown: string,
   title: string,
-  image: string
+  image: string,
 ) {
   const documents = await mdSplitter.createDocuments([markdown], [], {
     appendChunkOverlapHeader: false,
@@ -56,22 +56,22 @@ export async function ingest_md(
   url: string,
   userId: string,
   markdown: string,
-  title: string
+  title: string,
 ) {
   let image = extractImage(markdown) || (await processTweet(url)).image;
   console.log(
-    "url",
+    'url',
     url,
-    "userId",
+    'userId',
     userId,
-    "markdown",
+    'markdown',
     markdown.length,
-    "title",
+    'title',
     title,
-    "image",
-    image
+    'image',
+    image,
   );
-  await processIngestion(url, userId, markdown, title, image ?? "");
+  await processIngestion(url, userId, markdown, title, image ?? '');
 }
 
 export async function ingest_url(url: string, userId: string) {
@@ -79,25 +79,25 @@ export async function ingest_url(url: string, userId: string) {
   const title = await extractTitle(markdown, url);
   let image = extractImage(markdown) || (await processTweet(url)).image;
   console.log(
-    "url",
+    'url',
     url,
-    "userId",
+    'userId',
     userId,
-    "markdown",
+    'markdown',
     markdown.length,
-    "title",
+    'title',
     title,
-    "image",
-    image
+    'image',
+    image,
   );
-  await processIngestion(url, userId, markdown, title, image ?? "");
+  await processIngestion(url, userId, markdown, title, image ?? '');
 }
 
 async function addVectors(
   image: string,
   title: string,
   url: string,
-  documents: Document[]
+  documents: Document[],
 ): Promise<Array<Record<string, unknown>>> {
   const texts = documents.map(({ pageContent }) => pageContent);
   if (texts.length === 0) {
