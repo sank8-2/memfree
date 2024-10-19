@@ -24,12 +24,16 @@ function createTurndownService(url: string): TurndownService {
           return `![${node.getAttribute('alt') || ''}](${absoluteSrc})`;
         }
         return '';
+
+        
       },
     },
   ];
 
   const turndownService = new TurndownService();
-  rules.forEach((rule) => turndownService.addRule(rule.name, rule as any));
+  rules.forEach((rule) =>
+    turndownService.addRule(rule.name, rule as TurndownService.Rule),
+  );
   return turndownService;
 }
 
@@ -70,10 +74,10 @@ export async function urlToMarkdown(url: string): Promise<string> {
     );
 
     const dom = new JSDOM(documentContent, {
-      url: url,
+      url,
     });
 
-    let reader = new Readability(dom.window.document, {
+    const reader = new Readability(dom.window.document, {
       charThreshold: 0,
       keepClasses: true,
       nbTopCandidates: 20,
