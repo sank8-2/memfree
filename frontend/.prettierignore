@@ -3,3 +3,9 @@ node_modules
 .next
 build
 .contentlayer
+.cache
+package-lock.json
+public
+next-env.d.ts
+next.config.ts
+yarn.lock
